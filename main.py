@@ -62,8 +62,25 @@ async def on_message(message):
     embed.set_author(name = "New request!")
     embed.add_field(name="", value=f'**AR:** {r["AR"]} **CS:** {r["CS"]} **OD:** {r["OD"]}\n**Max Combo:** {r["MaxCombo"]}x', inline=True)
     embed.set_image(url=f'https://assets.ppy.sh/beatmaps/{r["ParentSetId"]}/covers/cover.jpg')
-      
+
+    class ranking(discord.ui.View):
+      @discord.ui.button(label="Rank", row=0, style=discord.ButtonStyle.success)
+      async def rank(self, button, interaction):
+        await message.channel.send("You clicked the button!")
+      @discord.ui.button(label="Love", row=0, style=discord.ButtonStyle.danger)
+      async def love(self, button, interaction):
+        await message.channel.send("You clicked the button!")
+      @discord.ui.button(label="Unrank", row=0, style=discord.ButtonStyle.gray)
+      async def unrank(self, button, interaction):
+        await message.channel.send("You clicked the button!")
+      @discord.ui.button(label="Download", row=1, style=discord.ButtonStyle.gray, emoji="💾")
+      async def download(self, button, interaction):
+        await message.channel.send("You clicked the button!")
+      @discord.ui.button(label="Preview", row=1, style=discord.ButtonStyle.link, url="https://osu.ppy.sh/beatmapsets/1725800#osu/3526981")
+      async def preview(self, button, interaction):
+        await message.channel.send("sdafsf")
+    
     c = client.get_channel(1059771218271678524)
-    await c.send(embed = embed)
+    await c.send(embed = embed, view = ranking())
 
 client.run(os.environ["TOKEN"])
