@@ -1,13 +1,9 @@
-
-
-# UPDATING DISCORD.PY FUCKED EVERYTHING UP HAHAHAHAHAHA
-
-
 import discord
 import os
 import requests
 
 intents = discord.Intents.default()
+intents.message_content = True
 client = discord.Client(intents=intents)
 
 class mapList():
@@ -46,14 +42,7 @@ async def on_ready():
 async def on_message(message):
   if message.author == client.user:
     return
-
-  if message.content.startswith('$hello'):
-    await message.channel.send('Hello!')
-
-@client.event
-async def on_message(message):
   if message.content.startswith('https://osu.ppy.sh/'):
-    print("hsdjgfalkjsd")
     url = message.content.split("/")
     id = url[-1]
     r = requests.get(f"https://api.chimu.moe/v1/map/{id}")
@@ -73,21 +62,8 @@ async def on_message(message):
     embed.set_author(name = "New request!")
     embed.add_field(name="", value=f'**AR:** {r["AR"]} **CS:** {r["CS"]} **OD:** {r["OD"]}\n**Max Combo:** {r["MaxCombo"]}x', inline=True)
     embed.set_image(url=f'https://assets.ppy.sh/beatmaps/{r["ParentSetId"]}/covers/cover.jpg')
-
-    view = discord.ui.View()
-    button = discord.ui.Button(Label = "click")
-    view.add_item(button)
       
     c = client.get_channel(1059771218271678524)
-    await c.send(embed = embed, view = view)
+    await c.send(embed = embed)
 
-  if message.content.startswith('list'):
-    ls.listMaps()
-
-try:
-  client.run(os.environ["TOKEN"])
-except discord.HTTPException as e:
-  if e.status == 429:
-    print("skill issue")
-  else:
-    raise e
+client.run(os.environ["TOKEN"])
