@@ -105,7 +105,7 @@ class Panel:
             "Connection": "keep-alive",
         }
         data = {
-            "beatmapid-1": f"{map_id}",
+            "bmapid-1": f"{map_id}",
             "rankstatus-1": "Ranked",
             "beatmapnumber": "1",
         }
@@ -128,7 +128,7 @@ class Panel:
             "Connection": "keep-alive",
         }
         data = {
-            "beatmapid-1": f"{map_id}",
+            "bmapid-1": f"{map_id}",
             "rankstatus-1": "Unranked",
             "beatmapnumber": "1",
         }
@@ -149,7 +149,7 @@ class Panel:
             "Connection": "keep-alive",
         }
         data = {
-            "beatmapid-1": f"{map_id}",
+            "bmapid-1": f"{map_id}",
             "rankstatus-1": "Loved",
             "beatmapnumber": "1",
         }
