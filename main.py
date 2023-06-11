@@ -2,7 +2,8 @@ import discord
 from discord.ext import commands
 import os
 import requests
-import sys
+from Panel import *
+from typing import Tuple, Union
 
 class mapList:
   def __init__(self, db=[]):
@@ -101,14 +102,15 @@ class Client(commands.Bot):
             super().__init__(timeout=None)
 
             preview = discord.ui.Button(row=1, label='Preview', style=discord.ButtonStyle.gray, url=f'https://osu-preview.jmir.ml/preview#{id}')
-            download = discord.ui.Button(row=1, label='Download', style=discord.ButtonStyle.gray, url=f'https://api.chimu.moe/v1{r["DownloadPath"]}')
+            download = discord.ui.Button(row=1, label='Download', style=discord.ButtonStyle.gray, url=f'https://api.chimu.moe/v1{r["DownloadPath"]}') # type: ignore
             self.add_item(preview)
             self.add_item(download)
         
           @discord.ui.button(label="Rank", row=0, style=discord.ButtonStyle.success)
           async def rank(self, interaction: discord.Interaction, button: discord.ui.Button):
-            r = requests.get('https://kap.kawata.pw/dash', auth=('10pc', os.getenv("password")))
-            await interaction.response.send_message(r.text)
+            logininfo = await interaction.response.send_modal(login())
+
+
 
           @discord.ui.button(label="Love", row=0, style=discord.ButtonStyle.danger)
           async def love(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -129,12 +131,17 @@ class Client(commands.Bot):
             )
             await message.add_reaction('❌')
           
-        c = client.get_channel(1059771218271678524)
-        await c.send(embed=embed, view=ranking())
+        c = client.get_channel(1098781180414918718)
+        await c.send(embed=embed, view=ranking()) # type: ignore
 
-  
-
-intents = discord.Intents.default()
+class login(discord.ui.Modal,title="Panel Login"):
+  username = discord.ui.TextInput(label="Username", placeholder="Loki", required=True)
+  password = discord.ui.TextInput(label="Password", placeholder="reallysecurepassword123", required=True)
+  async def on_submit(self, interaction: discord.Interaction):
+    pass
+intents = discord.Intents.all()
 intents.message_content = True
 client = Client(command_prefix="!!", intents=intents)
-client.run(os.getenv("TOKEN"))
+client.run(os.getenv["TOKEN"]) # type: ignore
+
+
