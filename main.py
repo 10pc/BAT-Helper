@@ -108,7 +108,12 @@ class Client(commands.Bot):
         
           @discord.ui.button(label="Rank", row=0, style=discord.ButtonStyle.success)
           async def rank(self, interaction: discord.Interaction, button: discord.ui.Button):
-            logininfo = await interaction.response.send_modal(login())
+              login_modal = Login()
+              await interaction.response.send_modal(login_modal)
+              await interaction.response.send_message("Logging in...", ephemeral=True)
+              submitted_username = login_modal.username
+              submitted_password = login_modal.password
+              usersession = Panel()
 
 
 
@@ -134,14 +139,20 @@ class Client(commands.Bot):
         c = client.get_channel(1098781180414918718)
         await c.send(embed=embed, view=ranking()) # type: ignore
 
-class login(discord.ui.Modal,title="Panel Login"):
-  username = discord.ui.TextInput(label="Username", placeholder="Loki", required=True)
-  password = discord.ui.TextInput(label="Password", placeholder="reallysecurepassword123", required=True)
-  async def on_submit(self, interaction: discord.Interaction):
-    pass
+class Login(discord.ui.Modal, title="Panel Login"):
+    def __init__(self):
+        super().__init__()
+        self.username = None
+        self.password = None
+
+    async def on_submit(self, interaction: discord.Interaction):
+        self.username = self.username.value #type: ignore
+        self.password = self.password.value #type: ignore
+        await super().on_submit(interaction)
+
 intents = discord.Intents.all()
 intents.message_content = True
 client = Client(command_prefix="!!", intents=intents)
-client.run(os.getenv["TOKEN"]) # type: ignore
+# run client
 
-
+  
