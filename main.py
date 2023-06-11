@@ -2,7 +2,8 @@ import discord
 from discord.ext import commands
 import os
 import requests
-import sys
+from Panel import *
+from typing import Tuple, Union
 
 class mapList:
   def __init__(self, db=[]):
@@ -101,27 +102,50 @@ class Client(commands.Bot):
             super().__init__(timeout=None)
 
             preview = discord.ui.Button(row=1, label='Preview', style=discord.ButtonStyle.gray, url=f'https://osu-preview.jmir.ml/preview#{id}')
-            download = discord.ui.Button(row=1, label='Download', style=discord.ButtonStyle.gray, url=f'https://api.chimu.moe/v1{r["DownloadPath"]}')
+            download = discord.ui.Button(row=1, label='Download', style=discord.ButtonStyle.gray, url=f'https://api.chimu.moe/v1{r["DownloadPath"]}') # type: ignore
             self.add_item(preview)
             self.add_item(download)
         
           @discord.ui.button(label="Rank", row=0, style=discord.ButtonStyle.success)
           async def rank(self, interaction: discord.Interaction, button: discord.ui.Button):
-            r = requests.get('https://kap.kawata.pw/dash', auth=('10pc', os.getenv("password")))
-            await interaction.response.send_message(r.text)
+              login_modal = Login()
+              await interaction.response.send_modal(login_modal)
+              await login_modal.wait()
+              await interaction.followup.send("Logging in...", ephemeral=True)
+              submitted_username = login_modal.username
+              submitted_password = login_modal.password
+              usersession = Panel()
+              await interaction.followup.send(usersession.login(submitted_username, submitted_password), ephemeral=True) #type: ignore
+              await interaction.followup.send(usersession.rank_map(id), ephemeral=True) #type: ignore
+              await interaction.followup.send(usersession.logout(), ephemeral=True)
+              
 
           @discord.ui.button(label="Love", row=0, style=discord.ButtonStyle.danger)
           async def love(self, interaction: discord.Interaction, button: discord.ui.Button):
-            await interaction.response.send_message(
-              "no way u clicked the love button", ephemeral=True
-            )
+              login_modal = Login()
+              await interaction.response.send_modal(login_modal)
+              await login_modal.wait()
+              await interaction.followup.send("Logging in...", ephemeral=True)
+              submitted_username = login_modal.username
+              submitted_password = login_modal.password
+              usersession = Panel()
+              await interaction.followup.send(usersession.login(submitted_username, submitted_password), ephemeral=True) #type: ignore
+              await interaction.followup.send(usersession.love_map(id), ephemeral=True) #type: ignore
+              await interaction.followup.send(usersession.logout(), ephemeral=True)
 
           @discord.ui.button(label="Unrank", row=0, style=discord.ButtonStyle.primary)
           async def unrank(self, interaction: discord.Interaction, button: discord.ui.Button):
-            await interaction.response.send_message(
-              "no way u clicked the unrank button", ephemeral=True
-            )
-
+              login_modal = Login()
+              await interaction.response.send_modal(login_modal)
+              await login_modal.wait()
+              await interaction.followup.send("Logging in...", ephemeral=True)
+              submitted_username = login_modal.username
+              submitted_password = login_modal.password
+              usersession = Panel()
+              await interaction.followup.send(usersession.login(submitted_username, submitted_password), ephemeral=True) #type: ignore
+              await interaction.followup.send(usersession.unrank_map(id), ephemeral=True) #type: ignore
+              await interaction.followup.send(usersession.logout(), ephemeral=True)
+              
           @discord.ui.button(label="Deny", row=0, style=discord.ButtonStyle.gray)
           async def deny(self, interaction: discord.Interaction, button: discord.ui.Button):
             await interaction.response.send_message(
@@ -130,11 +154,26 @@ class Client(commands.Bot):
             await message.add_reaction('❌')
           
         c = client.get_channel(1059771218271678524)
-        await c.send(embed=embed, view=ranking())
+        await c.send(embed=embed, view=ranking()) # type: ignore
 
-  
+class Login(discord.ui.Modal, title="Panel Login"):
+    def __init__(self):
+        super().__init__()
+        self.username = None
+        self.password = None
+        self.username_input = discord.ui.TextInput(label="Username", placeholder="Loki", required=True)
+        self.password_input = discord.ui.TextInput(label="Password", placeholder="reallysecurepassword123", required=True)
+        self.add_item(self.username_input)
+        self.add_item(self.password_input)
 
-intents = discord.Intents.default()
+    async def on_submit(self, interaction: discord.Interaction):
+        self.username = self.username_input.value
+        self.password = self.password_input.value
+        await super().on_submit(interaction)
+        self.stop()
+
+intents = discord.Intents.all()
 intents.message_content = True
 client = Client(command_prefix="!!", intents=intents)
 client.run(os.getenv("TOKEN"))
+  
