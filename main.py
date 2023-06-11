@@ -43,7 +43,7 @@ class Client(commands.Bot):
     )
   
   async def on_message(self, message):
-    if message.author != self.user and message.channel.id == 1115863989612728381 and (message.content.startswith("https://osu.ppy.sh/b/") or message.content.startswith("https://osu.ppy.sh/beatmapsets/")):
+    if message.author != self.user and message.channel.id == 598986787632709652 and (message.content.startswith("https://osu.ppy.sh/b/") or message.content.startswith("https://osu.ppy.sh/beatmapsets/")):
       url = message.content.split("/")
       if message.content.startswith("https://osu.ppy.sh/beatmapsets/") and len(url) < 6:
         fail = discord.Embed(description="Nu uh, that's a mapset link.\nPlease provide a map link instead.", color=0x00FF40)
@@ -79,7 +79,7 @@ class Client(commands.Bot):
           description="BN's have been notified, please wait.", color=0x00FF40
         )
         success.set_author(name="Request sent!")
-        await message.channel.send(message.id, embed=success, delete_after=5)
+        await message.channel.send(embed=success, delete_after=5)
 
         embed = discord.Embed(
           title=mapName[: len(mapName) - 4],
@@ -118,7 +118,9 @@ class Client(commands.Bot):
               await interaction.followup.send(usersession.login(submitted_username, submitted_password), ephemeral=True) #type: ignore
               await interaction.followup.send(usersession.rank_map(id), ephemeral=True) #type: ignore
               await interaction.followup.send(usersession.logout(), ephemeral=True)
-              
+              await interaction.followup.send(f'`https://osu.ppy.sh/b/{id}`\nRanked by {submitted_username}')
+              await message.add_reaction('✅')
+              await rankingPage.delete()
 
           @discord.ui.button(label="Love", row=0, style=discord.ButtonStyle.danger)
           async def love(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -132,6 +134,9 @@ class Client(commands.Bot):
               await interaction.followup.send(usersession.login(submitted_username, submitted_password), ephemeral=True) #type: ignore
               await interaction.followup.send(usersession.love_map(id), ephemeral=True) #type: ignore
               await interaction.followup.send(usersession.logout(), ephemeral=True)
+              await interaction.followup.send(f'`https://osu.ppy.sh/b/{id}`\nLoved by {submitted_username}')
+              await message.add_reaction('❤️')
+              await rankingPage.delete()
 
           @discord.ui.button(label="Unrank", row=0, style=discord.ButtonStyle.primary)
           async def unrank(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -145,16 +150,20 @@ class Client(commands.Bot):
               await interaction.followup.send(usersession.login(submitted_username, submitted_password), ephemeral=True) #type: ignore
               await interaction.followup.send(usersession.unrank_map(id), ephemeral=True) #type: ignore
               await interaction.followup.send(usersession.logout(), ephemeral=True)
+              await interaction.followup.send(f'`https://osu.ppy.sh/b/{id}`\nUnranked by {submitted_username}')
+              await message.add_reaction('❌')
+              await rankingPage.delete()
               
           @discord.ui.button(label="Deny", row=0, style=discord.ButtonStyle.gray)
           async def deny(self, interaction: discord.Interaction, button: discord.ui.Button):
             await interaction.response.send_message(
               "Denied"
             )
-            await message.add_reaction('❌')
+            await message.add_reaction('🚫')
+            await rankingPage.delete()
           
-        c = client.get_channel(1059771218271678524)
-        await c.send(embed=embed, view=ranking()) # type: ignore
+        c = client.get_channel(815264398947123210)
+        rankingPage = await c.send(embed=embed, view=ranking()) # type: ignore
 
 class Login(discord.ui.Modal, title="Panel Login"):
     def __init__(self):
@@ -175,5 +184,5 @@ class Login(discord.ui.Modal, title="Panel Login"):
 intents = discord.Intents.all()
 intents.message_content = True
 client = Client(command_prefix="!!", intents=intents)
-client.run(os.getenv("TOKEN"))
+client.run(os.getenv("krx"))
   
